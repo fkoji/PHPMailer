@@ -191,6 +191,12 @@ class SMTP
      */
     protected $last_reply = '';
 
+     /**
+      * The message id for Amazon SES
+      * @var string
+      */
+     protected $amazon_ses_message_id;
+
     /**
      * Output debugging info via a user-selected method.
      * @see SMTP::$Debugoutput
@@ -872,6 +878,10 @@ class SMTP
                 '',
                 $this->last_reply
             );
+
+            if (preg_match('!^250 Ok ([0-9a-f-]+)$!i', trim($this->last_reply), $matches)) {
+                $this->amazon_ses_message_id = $matches[1];
+            }
         } else {
             // Fall back to simple parsing if regex fails
             $code = substr($this->last_reply, 0, 3);
@@ -1177,5 +1187,14 @@ class SMTP
     public function getTimeout()
     {
         return $this->Timeout;
+    }
+
+    /**
+     * Get Amazon SES MessageId.
+     * @return string
+     */
+    public function getAmazonSesMessageId()
+    {
+        return $this->amazon_ses_message_id;
     }
 }
